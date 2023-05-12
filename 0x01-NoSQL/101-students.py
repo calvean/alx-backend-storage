@@ -27,4 +27,4 @@ def top_students(mongo_collection):
         }
     ]
     cur = mongo_collection.aggregate(pipeline)
-    return [document for document in cur]
+    return cur
