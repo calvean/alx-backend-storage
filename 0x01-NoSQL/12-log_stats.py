@@ -5,16 +5,16 @@ from pymongo import MongoClient
 
 if __name__ == "__main__":
     """ check all elements in collection """
-    client = MongoClient('mongodb://localhost:27017/')
-    collection = client['logs']['nginx']
+    client = MongoClient('mongodb://127.0.0.1:27017')
+    collection = client.logs.nginx
 
-    num_logs = collection.count_documents({})
-    print(f"{num_logs} logs")
+    print(f"{collection.estimated_document_count()} logs")
 
-    http_methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
-    for method in http_methods:
-        count = collection.count_documents({'method': method})
-        print(f"\t{count} {method} requests")
+    print("Methods:")
+    for method in ["GET", "POST", "PUT", "PATCH", "DELETE"]:
+        method_count = collection.count_documents({'method': method})
+        print(f"\tmethod {method}: {method_count}")
 
-    count = collection.count_documents({'method': 'GET', 'path': '/status'})
-    print(f"{count} requests with method=GET and path=/status")
+    check_get = collection.count_documents(
+        {'method': 'GET', 'path': "/status"})
+    print(f"{check_get} status check")
