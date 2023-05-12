@@ -1,31 +1,40 @@
 #!/usr/bin/env python3
-""" Caching HTTP Requests """
+""" String Redis """
 
 import requests
-from functools import wraps
-from typing import Callable
 import redis
+from functools import wraps
+
+redis_client = redis.Redis()
 
 
-def count_requests(method: Callable):
-    """ Count the number of requests to a URL """
-    r = redis.Redis()
+def cache_decorator(expires):
+    """Cache decorator to store function results in Redis"""
 
-    @wraps(method)
-    def wrapped(url):
-        """ Decorated function to count and cache requests """
-        r.incr(f"request_count:{url}")
-        cached = r.get(f"cached:{url}")
-        if cached:
-            return cached.decode('utf-8')
-        response = method(url)
-        r.setex(f"cached:{url}", 10, response)
-        return response
+    def decorator(func):
+        """ Decorator Function """
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            """ Wrapper Function """
+            cache_key = f"{func.__name__}:{str(args)}:{str(kwargs)}"
+            result = redis_client.get(cache_key)
+            if result is not None:
+                return result.decode("utf-8")
 
-    return wrapped
+            result = func(*args, **kwargs)
+            redis_client.setex(cache_key, expires, result)
+
+            return result
+
+        return wrapper
+
+    return decorator
 
 
-@count_requests
-def fetch_page(url: str) -> str:
-    """ Function to fetch HTML content of a URL """
-    return requests.get(url).text
+@cache_decorator(expires=10)
+def get_page(url):
+    """Fetches HTML content of given URL and caches the result"""
+
+    redis_client.incr(f"count:{url}")
+    response = requests.get(url)
+    return response.content.decode("utf-8")
