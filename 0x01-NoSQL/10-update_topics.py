@@ -2,12 +2,11 @@
 """ Change school topics """
 
 from typing import List
-from pymongo.collection import Collection
-from pymongo.results import UpdateResult
+import pymongo
 
 
 def update_topics(
-  mongo_collection: Collection,
+  mongo_collection,
   name: str,
   topics: List[str]) -> int:
     """
@@ -20,9 +19,6 @@ def update_topics(
     Return:
         number of updated documents
     """
-    result: UpdateResult = mongo_collection.update_many(
-        {'name': name},
-        {'$set': {'topics': topics}}
-    )
-
-    return result.modified_count
+    mongo_collection.update_many(
+      {'name': name},
+      {'$set': {'topics': topics}})
