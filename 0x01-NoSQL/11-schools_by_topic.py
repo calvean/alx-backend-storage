@@ -16,7 +16,9 @@ def schools_by_topic(mongo_collection, topic: str) -> List[str]:
     Return:
         number of updated documents
     """
+    results: list = []
 
-    result = mongo_collection.find({'topics': topic})
+    for result in mongo_collection.find({'topics': topic}):
+        results.append(result)
 
-    return [doc['name'] for doc in result]
+    return results
