@@ -6,6 +6,16 @@ import pymongo
 
 
 def schools_by_topic(mongo_collection, topic: str) -> List[str]:
+    """
+    function that changes all topics of a school document based on the name
+    Args:
+        mongo_collection: MongoDB Collection
+        name: school name to update
+        topics: list of topics approached in the school
+
+    Return:
+        number of updated documents
+    """
 
     result = mongo_collection.find({'topics': topic})
 
