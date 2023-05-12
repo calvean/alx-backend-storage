@@ -5,8 +5,8 @@ import requests
 import redis
 from functools import wraps
 
-
 redis_client = redis.Redis()
+
 
 def cache_decorator(expires):
     """Cache decorator to store function results in Redis"""
@@ -30,6 +30,7 @@ def cache_decorator(expires):
 
     return decorator
 
+
 @cache_decorator(expires=10)
 def get_page(url):
     """Fetches HTML content of given URL and caches the result"""
@@ -37,4 +38,3 @@ def get_page(url):
     redis_client.incr(f"count:{url}")
     response = requests.get(url)
     return response.content.decode("utf-8")
-
